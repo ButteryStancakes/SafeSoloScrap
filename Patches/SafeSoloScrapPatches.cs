@@ -1,41 +1,35 @@
 using HarmonyLib;
-using Unity.Netcode;
-using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace SafeSoloScrap.Patches
 {
     [HarmonyPatch]
     class SafeSoloScrapPatches
     {
-        [HarmonyPatch(typeof(RoundManager), "DespawnPropsAtEndOfRound")]
-        [HarmonyPrefix]
-        public static bool DespawnPropsAtEndOfRound(RoundManager __instance, bool despawnAllItems)
+        [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.DespawnPropsAtEndOfRound))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> TransDespawnPropsAtEndOfRound(IEnumerable<CodeInstruction> instructions)
         {
-            if (!__instance.IsServer)
-                return false;
+            List<CodeInstruction> codes = instructions.ToList();
 
-            GrabbableObject[] array = Object.FindObjectsOfType<GrabbableObject>();
-            for (int i = 0; i < array.Length; i++)
+            FieldInfo isScrap = AccessTools.Field(typeof(Item), nameof(Item.isScrap));
+            for (int i = 2; i < codes.Count; i++)
             {
-                if (despawnAllItems || (!array[i].isHeld && !array[i].isInShipRoom) || array[i].deactivated || (StartOfRound.Instance.allPlayersDead && array[i].itemProperties.isScrap && (StartOfRound.Instance.connectedPlayersAmount > 0 || (array[i].itemProperties.twoHanded && !Plugin.configKeepTwoHanded.Value))))
+                if (codes[i].opcode == OpCodes.Brfalse && codes[i - 1].opcode == OpCodes.Ldfld && (FieldInfo)codes[i - 1].operand == isScrap)
                 {
-                    if (array[i].isHeld && array[i].playerHeldBy != null)
-                        array[i].playerHeldBy.DropAllHeldItems();
-
-                    array[i].gameObject.GetComponent<NetworkObject>().Despawn();
+                    codes[i - 1].opcode = OpCodes.Call;
+                    codes[i - 1].operand = AccessTools.Method(typeof(ScrapSafe), nameof(ScrapSafe.IsItemLost));
+                    codes.RemoveAt(i - 2);
+                    Plugin.Logger.LogDebug("Transpiler (Penalty): Redirect scrap check to custom function");
+                    return codes;
                 }
-                else
-                    array[i].scrapPersistedThroughRounds = true;
-
-                if (__instance.spawnedSyncedObjects.Contains(array[i].gameObject))
-                    __instance.spawnedSyncedObjects.Remove(array[i].gameObject);
             }
 
-            GameObject[] array2 = GameObject.FindGameObjectsWithTag("TemporaryEffect");
-            for (int j = 0; j < array2.Length; j++)
-                Object.Destroy(array2[j]);
-
-            return false;
+            Plugin.Logger.LogError("Penalty transpiler failed");
+            return codes;
         }
     }
 }
