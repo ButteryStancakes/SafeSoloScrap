@@ -11,7 +11,7 @@ namespace SafeSoloScrap.Patches
     {
         [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.DespawnPropsAtEndOfRound))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> TransDespawnPropsAtEndOfRound(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> RoundManager_Trans_DespawnPropsAtEndOfRound(IEnumerable<CodeInstruction> instructions)
         {
             List<CodeInstruction> codes = instructions.ToList();
 

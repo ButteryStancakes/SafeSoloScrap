@@ -10,7 +10,7 @@ namespace SafeSoloScrap
     [BepInDependency(GUID_LOBBY_COMPATIBILITY, BepInDependency.DependencyFlags.SoftDependency)]
     public class Plugin : BaseUnityPlugin
     {
-        internal const string PLUGIN_GUID = "butterystancakes.lethalcompany.safesoloscrap", PLUGIN_NAME = "Safe Solo Scrap", PLUGIN_VERSION = "2.0.1";
+        internal const string PLUGIN_GUID = "butterystancakes.lethalcompany.safesoloscrap", PLUGIN_NAME = "Safe Solo Scrap", PLUGIN_VERSION = "2.1.0";
         public static ConfigEntry<int> configMaxPlayers;
 
         const string GUID_LOBBY_COMPATIBILITY = "BMX.LobbyCompatibility";
@@ -31,7 +31,7 @@ namespace SafeSoloScrap
                 "Gameplay",
                 "MaxPlayers",
                 1,
-                new ConfigDescription("How many players are allowed in the lobby before vanilla death penalty takes over?", new AcceptableValueRange<int>(1, 3)));
+                new ConfigDescription("How many players are allowed in the lobby before vanilla death penalty takes over?", new AcceptableValueRange<int>(1, 50)));
 
             // clean up config
             Config.Bind("Gameplay", "KeepTwoHanded", false, "Legacy setting, doesn't work");
