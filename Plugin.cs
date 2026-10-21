@@ -10,10 +10,11 @@ namespace SafeSoloScrap
     [BepInDependency(GUID_LOBBY_COMPATIBILITY, BepInDependency.DependencyFlags.SoftDependency)]
     public class Plugin : BaseUnityPlugin
     {
-        internal const string PLUGIN_GUID = "butterystancakes.lethalcompany.safesoloscrap", PLUGIN_NAME = "Safe Solo Scrap", PLUGIN_VERSION = "2.1.0";
+        internal const string PLUGIN_GUID = "butterystancakes.lethalcompany.safesoloscrap", PLUGIN_NAME = "Safe Solo Scrap", PLUGIN_VERSION = "2.1.1";
         public static ConfigEntry<int> configMaxPlayers;
 
         const string GUID_LOBBY_COMPATIBILITY = "BMX.LobbyCompatibility";
+        internal const string GUID_LATE_GAME_UPGRADES = "com.malco.lethalcompany.moreshipupgrades";
 
         internal static new ManualLogSource Logger;
 
